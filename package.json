@@ -1,0 +1,5 @@
+{
+  "name": "claude-toolkit-demo",
+  "private": true,
+  "workspaces": ["apps/*"]
+}

@@ -8,6 +8,7 @@ A simple Go + React monorepo used to demonstrate [claude-toolkit](https://github
 apps/
   api/    — Go backend (Gin + GORM + SQLite)
   web/    — React + TypeScript frontend
+turbo.json  — Turborepo config (enables monorepo detection)
 ```
 
 ## Run
