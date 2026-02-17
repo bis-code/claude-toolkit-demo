@@ -1,0 +1,89 @@
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
+
+type Task struct {
+	ID          string `json:"id" gorm:"primaryKey"`
+	Title       string `json:"title" binding:"required"`
+	Description string `json:"description"`
+	Status      string `json:"status" gorm:"default:todo"`
+	AssignedTo  string `json:"assignedTo"`
+}
+
+var db *gorm.DB
+
+func main() {
+	var err error
+	db, err = gorm.Open(sqlite.Open("tasks.db"), &gorm.Config{})
+	if err != nil {
+		log.Fatal("failed to connect database:", err)
+	}
+	db.AutoMigrate(&Task{})
+
+	r := gin.Default()
+
+	r.POST("/api/tasks", createTask)
+	r.GET("/api/tasks", listTasks)
+	r.GET("/api/tasks/:id", getTask)
+	r.PUT("/api/tasks/:id", updateTask)
+	r.DELETE("/api/tasks/:id", deleteTask)
+
+	r.Run(":8080")
+}
+
+func createTask(c *gin.Context) {
+	var task Task
+	if err := c.ShouldBindJSON(&task); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	task.ID = uuid.New().String()
+	task.Status = "todo"
+	db.Create(&task)
+	c.JSON(http.StatusCreated, task)
+}
+
+func listTasks(c *gin.Context) {
+	var tasks []Task
+	db.Find(&tasks)
+	c.JSON(http.StatusOK, tasks)
+}
+
+func getTask(c *gin.Context) {
+	var task Task
+	if err := db.First(&task, "id = ?", c.Param("id")).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+		return
+	}
+	c.JSON(http.StatusOK, task)
+}
+
+func updateTask(c *gin.Context) {
+	var task Task
+	if err := db.First(&task, "id = ?", c.Param("id")).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+		return
+	}
+	if err := c.ShouldBindJSON(&task); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	db.Save(&task)
+	c.JSON(http.StatusOK, task)
+}
+
+func deleteTask(c *gin.Context) {
+	if err := db.Delete(&Task{}, "id = ?", c.Param("id")).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}

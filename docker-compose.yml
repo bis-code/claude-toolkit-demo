@@ -1,0 +1,19 @@
+services:
+  api:
+    build: ./apps/api
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_PATH=/data/tasks.db
+    volumes:
+      - db-data:/data
+
+  web:
+    build: ./apps/web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  db-data:

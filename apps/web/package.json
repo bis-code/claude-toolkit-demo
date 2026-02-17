@@ -1,0 +1,22 @@
+{
+  "name": "claude-toolkit-demo-web",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "test": "vitest run",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0",
+    "eslint": "^9.0.0"
+  }
+}
