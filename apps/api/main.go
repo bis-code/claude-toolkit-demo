@@ -14,7 +14,7 @@ type Task struct {
 	ID          string `json:"id" gorm:"primaryKey"`
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description"`
-	Status      string `json:"status" gorm:"default:todo"`
+	Status      Status `json:"status" gorm:"default:todo"`
 	AssignedTo  string `json:"assignedTo"`
 }
 
@@ -46,7 +46,7 @@ func createTask(c *gin.Context) {
 		return
 	}
 	task.ID = uuid.New().String()
-	task.Status = "todo"
+	task.Status = StatusTodo
 	db.Create(&task)
 	c.JSON(http.StatusCreated, task)
 }
@@ -72,10 +72,24 @@ func updateTask(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
 		return
 	}
+
+	currentStatus := task.Status
+
 	if err := c.ShouldBindJSON(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	if !task.Status.IsValid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
+		return
+	}
+
+	if task.Status != currentStatus && !currentStatus.CanTransitionTo(task.Status) {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "invalid status transition"})
+		return
+	}
+
 	db.Save(&task)
 	c.JSON(http.StatusOK, task)
 }
