@@ -30,7 +30,7 @@ func main() {
 	db.AutoMigrate(&Task{})
 
 	r := gin.Default()
-	r.Use(cors.Default())
+	r.Use(cors.Default()) // TODO: restrict CORS origins for production
 
 	r.POST("/api/tasks", createTask)
 	r.GET("/api/tasks", listTasks)
@@ -93,7 +93,10 @@ func updateTask(c *gin.Context) {
 		return
 	}
 
-	db.Save(&task)
+	if err := db.Save(&task).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save task"})
+		return
+	}
 	c.JSON(http.StatusOK, task)
 }
 
@@ -111,7 +114,10 @@ func advanceTaskStatus(c *gin.Context) {
 	}
 
 	task.Status = next
-	db.Save(&task)
+	if err := db.Save(&task).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save task"})
+		return
+	}
 	c.JSON(http.StatusOK, task)
 }
 

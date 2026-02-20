@@ -9,14 +9,18 @@ const (
 	StatusDone       Status = "done"
 )
 
-var statusOrder = map[Status]int{
-	StatusTodo:       0,
-	StatusInProgress: 1,
-	StatusDone:       2,
-}
-
-// statusSequence defines the ordered lifecycle of a task status.
+// statusSequence is the single source of truth for status ordering.
 var statusSequence = []Status{StatusTodo, StatusInProgress, StatusDone}
+
+// statusOrder is derived from statusSequence for O(1) lookups.
+var statusOrder map[Status]int
+
+func init() {
+	statusOrder = make(map[Status]int, len(statusSequence))
+	for i, s := range statusSequence {
+		statusOrder[s] = i
+	}
+}
 
 // NextStatus returns the next status in the lifecycle sequence.
 // Returns ("", false) if the status is the final state or unrecognized.
