@@ -14,9 +14,13 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.3.0",
+    "eslint": "^9.0.0",
+    "happy-dom": "^20.6.3",
     "vite": "^6.0.0",
-    "vitest": "^3.0.0",
-    "eslint": "^9.0.0"
+    "vitest": "^3.0.0"
   }
 }
