@@ -47,6 +47,11 @@ func TestStatusCanTransitionTo(t *testing.T) {
 		{"in_progress to todo", StatusInProgress, StatusTodo, false},
 		{"todo to todo", StatusTodo, StatusTodo, false},
 		{"done to done", StatusDone, StatusDone, false},
+
+		// Invalid source or target
+		{"invalid source to in_progress", Status("garbage"), StatusInProgress, false},
+		{"todo to invalid target", StatusTodo, Status("nope"), false},
+		{"invalid source to invalid target", Status("x"), Status("y"), false},
 	}
 
 	for _, tt := range tests {

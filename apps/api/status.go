@@ -17,19 +17,17 @@ var statusOrder = map[Status]int{
 
 // IsValid returns true if the status is a recognized value.
 func (s Status) IsValid() bool {
-	switch s {
-	case StatusTodo, StatusInProgress, StatusDone:
-		return true
-	default:
-		return false
-	}
+	_, ok := statusOrder[s]
+	return ok
 }
 
 // CanTransitionTo returns true if moving from s to next is allowed.
 // Transitions must be forward-only (higher order value).
 func (s Status) CanTransitionTo(next Status) bool {
-	if !next.IsValid() {
+	fromOrd, fromOk := statusOrder[s]
+	toOrd, toOk := statusOrder[next]
+	if !fromOk || !toOk {
 		return false
 	}
-	return statusOrder[next] > statusOrder[s]
+	return toOrd > fromOrd
 }
