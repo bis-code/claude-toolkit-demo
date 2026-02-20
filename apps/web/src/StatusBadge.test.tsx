@@ -8,8 +8,6 @@ afterEach(() => {
 })
 
 describe('StatusBadge', () => {
-  // --- Rendering tests ---
-
   it('renders "todo" text with gray background', () => {
     render(<StatusBadge status="todo" />)
     const badge = screen.getByText('todo')
@@ -31,16 +29,14 @@ describe('StatusBadge', () => {
     expect(badge).toHaveStyle({ backgroundColor: '#22c55e' })
   })
 
-  // --- Clickability tests ---
-
-  it('renders todo as a button', () => {
+  it('renders todo as a button with accessible label', () => {
     render(<StatusBadge status="todo" onClick={vi.fn()} />)
-    expect(screen.getByRole('button', { name: 'todo' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Advance status from todo' })).toBeInTheDocument()
   })
 
-  it('renders in_progress as a button', () => {
+  it('renders in_progress as a button with accessible label', () => {
     render(<StatusBadge status="in_progress" onClick={vi.fn()} />)
-    expect(screen.getByRole('button', { name: 'in progress' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Advance status from in progress' })).toBeInTheDocument()
   })
 
   it('renders done as a span, not a button', () => {
@@ -49,14 +45,12 @@ describe('StatusBadge', () => {
     expect(screen.getByText('done').tagName).toBe('SPAN')
   })
 
-  // --- onClick behavior ---
-
   it('calls onClick when clicking a todo badge', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()
     render(<StatusBadge status="todo" onClick={onClick} />)
 
-    await user.click(screen.getByRole('button', { name: 'todo' }))
+    await user.click(screen.getByRole('button', { name: 'Advance status from todo' }))
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
@@ -65,7 +59,7 @@ describe('StatusBadge', () => {
     const onClick = vi.fn()
     render(<StatusBadge status="in_progress" onClick={onClick} />)
 
-    await user.click(screen.getByRole('button', { name: 'in progress' }))
+    await user.click(screen.getByRole('button', { name: 'Advance status from in progress' }))
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 })

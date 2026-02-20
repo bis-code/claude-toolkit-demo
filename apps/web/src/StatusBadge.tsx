@@ -1,23 +1,25 @@
-const STATUS_COLORS: Record<string, string> = {
+export type TaskStatus = 'todo' | 'in_progress' | 'done'
+
+const STATUS_COLORS: Record<TaskStatus, string> = {
   todo: '#9ca3af',
   in_progress: '#3b82f6',
   done: '#22c55e',
 }
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS: Record<TaskStatus, string> = {
   todo: 'todo',
   in_progress: 'in progress',
   done: 'done',
 }
 
 interface StatusBadgeProps {
-  status: string
+  status: TaskStatus
   onClick?: () => void
 }
 
 export function StatusBadge({ status, onClick }: StatusBadgeProps) {
-  const color = STATUS_COLORS[status] ?? '#9ca3af'
-  const label = STATUS_LABELS[status] ?? status
+  const color = STATUS_COLORS[status]
+  const label = STATUS_LABELS[status]
   const isDone = status === 'done'
 
   const style = {
@@ -35,7 +37,7 @@ export function StatusBadge({ status, onClick }: StatusBadgeProps) {
   }
 
   return (
-    <button type="button" style={style} onClick={onClick}>
+    <button type="button" style={style} onClick={onClick} aria-label={`Advance status from ${label}`}>
       {label}
     </button>
   )
