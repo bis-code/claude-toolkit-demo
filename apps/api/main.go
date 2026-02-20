@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/driver/sqlite"
@@ -29,12 +30,14 @@ func main() {
 	db.AutoMigrate(&Task{})
 
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	r.POST("/api/tasks", createTask)
 	r.GET("/api/tasks", listTasks)
 	r.GET("/api/tasks/:id", getTask)
 	r.PUT("/api/tasks/:id", updateTask)
 	r.DELETE("/api/tasks/:id", deleteTask)
+	r.PATCH("/api/tasks/:id/status", advanceTaskStatus)
 
 	r.Run(":8080")
 }
@@ -90,6 +93,24 @@ func updateTask(c *gin.Context) {
 		return
 	}
 
+	db.Save(&task)
+	c.JSON(http.StatusOK, task)
+}
+
+func advanceTaskStatus(c *gin.Context) {
+	var task Task
+	if err := db.First(&task, "id = ?", c.Param("id")).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "task not found"})
+		return
+	}
+
+	next, ok := task.Status.NextStatus()
+	if !ok {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "task is already done"})
+		return
+	}
+
+	task.Status = next
 	db.Save(&task)
 	c.JSON(http.StatusOK, task)
 }
