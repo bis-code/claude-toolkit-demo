@@ -15,6 +15,20 @@ var statusOrder = map[Status]int{
 	StatusDone:       2,
 }
 
+// statusSequence defines the ordered lifecycle of a task status.
+var statusSequence = []Status{StatusTodo, StatusInProgress, StatusDone}
+
+// NextStatus returns the next status in the lifecycle sequence.
+// Returns ("", false) if the status is the final state or unrecognized.
+func (s Status) NextStatus() (Status, bool) {
+	for i, st := range statusSequence {
+		if st == s && i+1 < len(statusSequence) {
+			return statusSequence[i+1], true
+		}
+	}
+	return "", false
+}
+
 // IsValid returns true if the status is a recognized value.
 func (s Status) IsValid() bool {
 	_, ok := statusOrder[s]
